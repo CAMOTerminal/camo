@@ -13,7 +13,7 @@ const RPCS = (process.env.RPC_URL || 'https://rpc.mainnet.chain.robinhood.com').
 const GT = 'https://api.geckoterminal.com/api/v2/networks/robinhood', DS = 'https://api.dexscreener.com', RELAY = process.env.RELAY_URL || 'https://api.relay.link', ONE = process.env.ONECLICK_URL || 'https://1click.chaindefuser.com';
 const ROUTE_FEE_TO = process.env.ROUTE_FEE_TO || '', ROUTE_FEE_BPS = +process.env.ROUTE_FEE_BPS || 0, FEE_BPS = Math.min(100, Math.max(0, +process.env.FEE_BPS || 0)), FEE_TO = /^0x[0-9a-fA-F]{40}$/.test(process.env.FEE_TO || '') ? process.env.FEE_TO : '';
 const okUrl = (u) => (/^https:\/\//.test(u || '') ? u : ''), okAddr = (a) => (/^0x[0-9a-fA-F]{40}$/.test(a || '') ? a : '');
-const SITE = { x: okUrl(process.env.X_URL), gh: okUrl(process.env.GH_URL) || 'https://github.com/CAMOTerminal/camo', mint: okAddr(process.env.TOKEN_MINT) };
+const SITE = { x: okUrl(process.env.X_URL) || 'https://x.com/CAMOTerminal', gh: okUrl(process.env.GH_URL) || 'https://github.com/CAMOTerminal/camo', mint: okAddr(process.env.TOKEN_MINT) };
 const ETH = '0x0000000000000000000000000000000000000000', WETH = '0x0bd7d308f8e1639fab988df18a8011f41eacad73', ETH_ASSET = 'nep141:hood.omft.near', QUOTER = '0x1111111111111111111111111111111111111111'; // stand-in sender for price previews before a wallet is chosen
 const ADDR = /^0x[0-9a-fA-F]{40}$/, HASH = /^0x[0-9a-fA-F]{64}$/, POOL = /^0x[0-9a-fA-F]{40}([0-9a-fA-F]{24})?$/;
 process.on('uncaughtException', (e) => { console.error('uncaught', e?.message || e); if (e?.code === 'EADDRINUSE') process.exit(1); });
