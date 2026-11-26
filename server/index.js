@@ -72,7 +72,11 @@ function fromDS(p) {
     links: [...(p.info?.websites || []).map((w) => ({ t: 'web', u: w.url })), ...(p.info?.socials || []).map((s) => ({ t: s.type, u: s.url }))].filter((l) => /^https:\/\//.test(l.u)).slice(0, 4) };
 }
 async function token(mint) {
-  return cached('tok:' + mint.toLowerCase(), 8000, async () => { const j = await get(DS + '/tokens/v1/robinhood/' + mint); const pairs = (Array.isArray(j) ? j : []).filter((p) => p.baseToken?.address?.toLowerCase() === mint.toLowerCase()).sort((a, b) => (b.liquidity?.usd || 0) - (a.liquidity?.usd || 0)); if (!pairs.length) { const e = new Error('No market found for this token'); e.status = 404; throw e; } return fromDS(pairs[0]); });
+  return cached('tok:' + mint.toLowerCase(), 8000, async () => { const j = await get(DS + '/tokens/v1/robinhood/' + mint); const pairs = (Array.isArray(j) ? j : []).filter((p) => p.baseToken?.address?.toLowerCase() === mint.toLowerCase()).sort((a, b) => (b.liquidity?.usd || 0) - (a.liquidity?.usd || 0)); if (pairs.length) return fromDS(pairs[0]);
+    // a pool the first source has not indexed yet is still a market: read it from the second one
+    let rows = []; try { rows = fromGT(await get(GT + '/tokens/' + mint + '/pools?include=base_token,dex&page=1')).filter((r) => r.mint.toLowerCase() === mint.toLowerCase()).sort((a, b) => (b.liq || 0) - (a.liq || 0)); } catch { /* fall through to the 404 */ }
+    if (!rows.length) { const e = new Error('No market found for this token'); e.status = 404; throw e; }
+    return { quote: 'WETH', priceNative: null, fdv: rows[0].mcap, liqBase: null, liqQuote: null, links: [], ...rows[0] }; });
 }
 // read straight from the contract: decimals, supply and whether an owner can still act on it
 async function tokenInfo(mint) {
